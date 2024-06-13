@@ -118,6 +118,9 @@ SELECT * FROM MARCAS_VEICULOS;
 -- Selecionando todos os dados da tabela de Veículos
 SELECT * FROM VEICULOS;
 
+-- Selecionando todos os dados da tabela de Fotos Veículos
+SELECT * FROM VEICULOS_FOTOS;
+
 -- Selecionando todos os dados da tabela de Clientes
 SELECT * FROM CLIENTES;
 
@@ -142,3 +145,6 @@ JOIN TIPOSVEICULOS TV ON V.IdTipo = TV.IdTipo
 JOIN MARCAS_VEICULOS MV ON V.IdMarca = MV.IdMarca
 JOIN CLIENTES C ON V.IdCli = C.IdCli
 LEFT JOIN VEICULOS_ACESSORIO VA ON V.IdVeic = VA.IdVeic;
+
+
+

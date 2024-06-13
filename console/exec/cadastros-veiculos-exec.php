@@ -38,19 +38,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $ValorIn = $_POST['ValorIn'] ?? null;
     $ValorOut = $_POST['ValorOut'] ?? null;
 
-    // Inserir o novo veículo
-    $sql = "INSERT INTO VEICULOS (IdTipo, IdMarca, IdCli, Modelo, Ano_Fab, Ano_Mod, km, Renavan, Placa, Cor, Combustivel, Cambio, Categoria, Portas, ValorIn, ValorOut) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $conexao->prepare($sql);
-
-    // Tratar campos opcionais
-    $stmt->bind_param("iiisssissssssiid", $IdTipo, $IdMarca, $IdCli, $Modelo, $Ano_Fab, $Ano_Mod, $km, $Renavan, $Placa, $Cor, $Combustivel, $Cambio, $Categoria, $Portas, $ValorIn, $ValorOut);
-    
     // Substituir valores vazios por NULL
     foreach ([$IdCli, $Modelo, $Ano_Fab, $Ano_Mod, $km, $Renavan, $Placa, $Cor, $Combustivel, $Cambio, $Categoria, $Portas, $ValorIn, $ValorOut] as &$value) {
         if (empty($value)) {
             $value = NULL;
         }
     }
+
+    // Inserir o novo veículo
+    $sql = "INSERT INTO VEICULOS (IdTipo, IdMarca, IdCli, Modelo, Ano_Fab, Ano_Mod, km, Renavan, Placa, Cor, Combustivel, Cambio, Categoria, Portas, ValorIn, ValorOut) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conexao->prepare($sql);
+    $stmt->bind_param("iiisssissssssiid", $IdTipo, $IdMarca, $IdCli, $Modelo, $Ano_Fab, $Ano_Mod, $km, $Renavan, $Placa, $Cor, $Combustivel, $Cambio, $Categoria, $Portas, $ValorIn, $ValorOut);
 
     if ($stmt->execute()) {
         $IdVeic = $stmt->insert_id; // Obter o ID do veículo recém-inserido
@@ -61,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_FILES["foto$i"]) && $_FILES["foto$i"]['error'] == UPLOAD_ERR_OK) {
                 $extensao = pathinfo($_FILES["foto$i"]['name'], PATHINFO_EXTENSION);
                 $novo_nome = $IdVeic . "_foto$i." . $extensao;
-                $caminho = "imagens/" . $novo_nome;
+                $caminho = "VEICULOS_FOTOS/" . $novo_nome;
 
                 if (move_uploaded_file($_FILES["foto$i"]['tmp_name'], $caminho)) {
                     $sql_foto = "INSERT INTO VEICULOS_FOTOS (IdVeic, Caminho_Foto) VALUES (?, ?)";

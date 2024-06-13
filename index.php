@@ -18,6 +18,10 @@
         .alinhar-direita {
             text-align: right;
         }
+        .img-thumbnail {
+            width: 100px;
+            height: auto;
+        }
     </style>
 </head>
 <body>
@@ -32,6 +36,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Foto</th>
                         <th>Marca</th>
                         <th>Modelo</th>
                         <th>Ano</th>
@@ -41,8 +46,14 @@
                 </thead>
                 <tbody>
                     <?php
-                    // Ajustar a consulta SQL para fazer o JOIN entre VEICULOS e MARCAS_VEICULOS
-                    $sql = "SELECT VEICULOS.IdVeic, MARCAS_VEICULOS.Marca AS Marca, VEICULOS.Modelo, VEICULOS.Ano_Fab, VEICULOS.km, VEICULOS.ValorOut 
+                    // Ajustar a consulta SQL para fazer o JOIN entre VEICULOS e MARCAS_VEICULOS, e obter a primeira foto
+                    $sql = "SELECT VEICULOS.IdVeic, 
+                                   MARCAS_VEICULOS.Marca AS Marca, 
+                                   VEICULOS.Modelo, 
+                                   VEICULOS.Ano_Fab, 
+                                   VEICULOS.km, 
+                                   VEICULOS.ValorOut, 
+                                   (SELECT Caminho_Foto FROM VEICULOS_FOTOS WHERE VEICULOS_FOTOS.IdVeic = VEICULOS.IdVeic LIMIT 1) AS Foto 
                             FROM VEICULOS 
                             JOIN MARCAS_VEICULOS ON VEICULOS.IdMarca = MARCAS_VEICULOS.IdMarca";
                     $result = $conexao->query($sql);
@@ -50,6 +61,13 @@
                         while($row = $result->fetch_assoc()) {
                             echo "<tr>";
                             echo "<td><a href='detalhes_veiculo.php?id=" . $row['IdVeic'] . "'>" . $row['IdVeic'] . "</a></td>";
+                            echo "<td>";
+                            if (!empty($row['Foto'])) {
+                                echo "<img src='" . $row['Foto'] . "' alt='Foto do Veículo' class='img-thumbnail'>";
+                            } else {
+                                echo "Sem foto";
+                            }
+                            echo "</td>";
                             echo "<td>" . $row['Marca'] . "</td>";
                             echo "<td>" . $row['Modelo'] . "</td>";
                             echo "<td>" . $row['Ano_Fab'] . "</td>";
@@ -58,7 +76,7 @@
                             echo "</tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>Nenhum veículo cadastrado.</td></tr>";
+                        echo "<tr><td colspan='7'>Nenhum veículo cadastrado.</td></tr>";
                     }
                     ?>
                 </tbody>

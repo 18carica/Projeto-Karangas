@@ -7,21 +7,6 @@ include "oracle.php"; // Certifique-se de que este arquivo contém a conexão co
 $veiculo = null;
 $mensagem = '';
 
-// Função para obter fotos do veículo
-function getFotosVeiculo($conexao, $IdVeic) {
-    $fotos = [];
-    $sql_fotos = "SELECT Caminho_Foto FROM VEICULOS_FOTOS WHERE IdVeic = ?";
-    $stmt_fotos = $conexao->prepare($sql_fotos);
-    $stmt_fotos->bind_param("i", $IdVeic);
-    $stmt_fotos->execute();
-    $result_fotos = $stmt_fotos->get_result();
-    while ($row = $result_fotos->fetch_assoc()) {
-        $fotos[] = $row['Caminho_Foto'];
-    }
-    $stmt_fotos->close();
-    return $fotos;
-}
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['search'])) {
         $search_term = trim($_POST['search_term']);
@@ -34,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $result = $stmt->get_result();
             if ($result->num_rows > 0) {
                 $veiculo = $result->fetch_assoc();
-                $veiculo['fotos'] = getFotosVeiculo($conexao, $veiculo['IdVeic']);
             } else {
                 $mensagem = "Nenhum veículo encontrado com o ID ou Modelo especificado.";
             }
@@ -63,28 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $sql = "UPDATE VEICULOS SET IdTipo = ?, IdMarca = ?, IdCli = ?, Modelo = ?, Ano_Fab = ?, Ano_Mod = ?, km = ?, Renavan = ?, Placa = ?, Cor = ?, Combustivel = ?, Cambio = ?, Categoria = ?, Portas = ?, ValorIn = ?, ValorOut = ? WHERE IdVeic = ?";
         $stmt = $conexao->prepare($sql);
-        $stmt->bind_param("iiiisssssssssssii", $IdTipo, $IdMarca, $IdCli, $Modelo, $Ano_Fab, $Ano_Mod, $km, $Renavan, $Placa, $Cor, $Combustivel, $Cambio, $Categoria, $Portas, $ValorIn, $ValorOut, $IdVeic);
+        $stmt->bind_param("iiiisssssssssssii", $IdVeic, $IdTipo, $IdMarca, $IdCli, $Modelo, $Ano_Fab, $Ano_Mod, $km, $Renavan, $Placa, $Cor, $Combustivel, $Cambio, $Categoria, $Portas, $ValorIn, $ValorOut);
         if ($stmt->execute()) {
             $mensagem = "Veículo atualizado com sucesso!";
-            
-            // Processar upload de fotos
-            for ($i = 1; $i <= 4; $i++) {
-                if (isset($_FILES["foto$i"]) && $_FILES["foto$i"]['error'] == UPLOAD_ERR_OK) {
-                    $extensao = pathinfo($_FILES["foto$i"]['name'], PATHINFO_EXTENSION);
-                    $novo_nome = $IdVeic . "_foto$i." . $extensao;
-                    $caminho = "imagens/" . $novo_nome;
-
-                    if (move_uploaded_file($_FILES["foto$i"]['tmp_name'], $caminho)) {
-                        $sql_foto = "INSERT INTO VEICULOS_FOTOS (IdVeic, Caminho_Foto) VALUES (?, ?) ON DUPLICATE KEY UPDATE Caminho_Foto = VALUES(Caminho_Foto)";
-                        $stmt_foto = $conexao->prepare($sql_foto);
-                        $stmt_foto->bind_param("is", $IdVeic, $caminho);
-                        $stmt_foto->execute();
-                        $stmt_foto->close();
-                    }
-                }
-            }
-            
-            $veiculo['fotos'] = getFotosVeiculo($conexao, $IdVeic);
         } else {
             $mensagem = "Erro ao atualizar o veículo: " . $stmt->error;
         }
@@ -129,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   </form>
 
   <?php if ($veiculo): ?>
-  <form action="modificar-cadastros-veiculos.php" method="post" class="mt-4" enctype="multipart/form-data">
+  <form action="modificar-cadastros-veiculos.php" method="post" class="mt-4">
     <input type="hidden" name="IdVeic" value="<?php echo $veiculo['IdVeic']; ?>">
     <div class="mb-3">
       <label for="IdTipo" class="form-label">Tipo</label>
@@ -194,25 +159,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="mb-3">
       <label for="ValorOut" class="form-label">Valor de Saída</label>
       <input type="number" step="0.01" class="form-control" id="ValorOut" name="ValorOut" value="<?php echo $veiculo['ValorOut']; ?>">
-    </div>
-    <div class="mb-3">
-      <label for="fotos" class="form-label">Fotos</label>
-      <?php if (!empty($veiculo['fotos'])): ?>
-        <div class="mb-3">
-          <?php foreach ($veiculo['fotos'] as $index => $foto): ?>
-            <div class="d-flex align-items-center mb-2">
-              <img src="<?php echo $foto; ?>" alt="Foto do Veículo" class="img-thumbnail me-2" width="150">
-              <input type="file" name="foto<?php echo $index + 1; ?>" class="form-control">
-            </div>
-          <?php endforeach; ?>
-        </div>
-      <?php else: ?>
-        <div class="mb-3">
-          <?php for ($i = 1; $i <= 4; $i++): ?>
-            <input type="file" name="foto<?php echo $i; ?>" class="form-control mb-2">
-          <?php endfor; ?>
-        </div>
-      <?php endif; ?>
     </div>
     <button type="submit" name="update" class="btn btn-primary">Atualizar Veículo</button>
   </form>
