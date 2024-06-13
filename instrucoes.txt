@@ -1,0 +1,34 @@
+raiz - //localhost
+
+    0-Dev - Pasta  // Pasta de rascunhos do projeto, onde ficam por exemplo, os scripts do banco de dados
+                    // Ou Arquivos que vocês não precisam mais usar.
+
+    Console - Pasta // Pasta de execução dos arquivos restritos do acesso ao sistema do projeto
+        css  - pasta   // pasta onde ficarão todos os arquivos css do projeto todo.
+        exec - pasta   //ATENÇÃO: TODOS OS ARQUIVOS DE PROCESSAMENTO (EXECUÇÃO DO PROJETO INTEIRO DEVERÃO FICAR DENTRO DESSA PASTA)
+        fn   - pasta   // pasta onde deverão ficar os includes de funções que serão usados no projeto
+        img  - pasta   // pasta onde ficarão todas as imagens que eventualmente serão usadas dentro do console, exceto as fotos dos carros.           
+        jn   - pasta   // pasta onde ficarão todos os arquivos js (Javascript que serão usados no projeto)
+
+        index.php // Login para acessar o sistema
+        sair.php  // para para sair do sistema, redireciona para página principal
+
+    imagens - pasta // siga a estrutura conforme o indicado
+        site   - pasta // onde ficarão todas as imagens gerais do uso do site acessado pelo cliente
+        carros - pasta // onde ficarão todas as imagens de carros
+        
+
+
+
+    index.php      // página principal do site, essa de acesso geral do publico para 
+                   // aquela que o cliente acessaria caso o site fosse publicano na web
+
+    
+
+USUARIO / SENHA
+zeruela
+parafuso    
+
+
+
+
