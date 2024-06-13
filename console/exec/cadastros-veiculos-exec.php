@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Tratar campos opcionais
     $stmt->bind_param("iiisssissssssiid", $IdTipo, $IdMarca, $IdCli, $Modelo, $Ano_Fab, $Ano_Mod, $km, $Renavan, $Placa, $Cor, $Combustivel, $Cambio, $Categoria, $Portas, $ValorIn, $ValorOut);
-
+    
     // Substituir valores vazios por NULL
     foreach ([$IdCli, $Modelo, $Ano_Fab, $Ano_Mod, $km, $Renavan, $Placa, $Cor, $Combustivel, $Cambio, $Categoria, $Portas, $ValorIn, $ValorOut] as &$value) {
         if (empty($value)) {
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_FILES["foto$i"]) && $_FILES["foto$i"]['error'] == UPLOAD_ERR_OK) {
                 $extensao = pathinfo($_FILES["foto$i"]['name'], PATHINFO_EXTENSION);
                 $novo_nome = $IdVeic . "_foto$i." . $extensao;
-                $caminho = "uploads/" . $novo_nome;
+                $caminho = "imagens/" . $novo_nome;
 
                 if (move_uploaded_file($_FILES["foto$i"]['tmp_name'], $caminho)) {
                     $sql_foto = "INSERT INTO VEICULOS_FOTOS (IdVeic, Caminho_Foto) VALUES (?, ?)";
