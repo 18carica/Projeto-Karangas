@@ -34,17 +34,17 @@ Para executar este projeto localmente, você precisa ter instalado:
 
 2. **Configurar o Banco de Dados:**
 
-- Importe o esquema do banco de dados a partir do arquivo database.sql.
-- Configure as credenciais do banco de dados no arquivo console/oracle.php.
+   - Importe o esquema do banco de dados a partir do arquivo database.sql.
+   - Configure as credenciais do banco de dados no arquivo console/oracle.php.
 
 3. **Configurar o Ambiente Web:**
 
-- Certifique-se de que seu servidor web está configurado para servir arquivos PHP.
-- Verifique as configurações de permissões e caminhos dentro do projeto, conforme necessário.
+   - Certifique-se de que seu servidor web está configurado para servir arquivos PHP.
+   - Verifique as configurações de permissões e caminhos dentro do projeto, conforme necessário.
 
 4. **Acessar o Projeto:**
 
-- Abra seu navegador e vá para http://localhost/karanga (ou o caminho correspondente configurado no seu servidor web).
+Abra seu navegador e vá para <http://localhost/karanga> (ou o caminho correspondente configurado no seu servidor web).
 
 ## Estrutura de Arquivos
 
@@ -61,6 +61,7 @@ Para executar este projeto localmente, você precisa ter instalado:
 ## Como Usar
 
 ### Listar Veículos
+
 Acesse a página principal (index.php) para visualizar uma lista de veículos cadastrados com os seguintes dados:
 
 - Marca
@@ -70,12 +71,15 @@ Acesse a página principal (index.php) para visualizar uma lista de veículos ca
 - Valor de Saída
 
 ## Modificar Veículos
+
 Na página de modificação de veículos (modificar-cadastros-veiculos.php), você pode pesquisar um veículo por ID ou modelo e atualizar seus dados.
 
-Modificar Funcionários, Clientes, Tipos e Marcas
+## Modificar Funcionários, Clientes, Tipos e Marcas
+
 Cada um desses elementos possui sua própria página de modificação, acessível a partir do menu de navegação.
 
 ## Contribuições
+
 Contribuições são bem-vindas! Se você deseja melhorar este projeto:
 
 1. Faça um fork do repositório.
@@ -85,12 +89,12 @@ Contribuições são bem-vindas! Se você deseja melhorar este projeto:
 5. Abra um Pull Request.
 
 ## Licença
-Este projeto está licenciado sob a Licença MIT - veja o arquivo LICENSE para mais detalhes.
+
+Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE] para mais detalhes.
 
 © 2024 Karanga. Desenvolvido como parte de uma aula demo.
 
-
-### Explicação do README.md:
+### Explicação do README.md
 
 - **Descrição do Projeto**: Uma breve introdução ao projeto e uma imagem do logo, se disponível.
   
