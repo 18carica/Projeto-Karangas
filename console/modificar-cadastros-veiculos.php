@@ -7,21 +7,6 @@ include "oracle.php"; // Certifique-se de que este arquivo contém a conexão co
 $veiculo = null;
 $mensagem = '';
 
-// Função para obter fotos do veículo
-function getFotosVeiculo($conexao, $IdVeic) {
-    $fotos = [];
-    $sql_fotos = "SELECT Caminho_Foto FROM VEICULOS_FOTOS WHERE IdVeic = ?";
-    $stmt_fotos = $conexao->prepare($sql_fotos);
-    $stmt_fotos->bind_param("i", $IdVeic);
-    $stmt_fotos->execute();
-    $result_fotos = $stmt_fotos->get_result();
-    while ($row = $result_fotos->fetch_assoc()) {
-        $fotos[] = $row['Caminho_Foto'];
-    }
-    $stmt_fotos->close();
-    return $fotos;
-}
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['search'])) {
         $search_term = trim($_POST['search_term']);
@@ -34,7 +19,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $result = $stmt->get_result();
             if ($result->num_rows > 0) {
                 $veiculo = $result->fetch_assoc();
-                $veiculo['fotos'] = getFotosVeiculo($conexao, $veiculo['IdVeic']);
+
+                // Obter fotos do veículo
+                $veiculo['fotos'] = [];
+                $sql_fotos = "SELECT Caminho_Foto FROM VEICULOS_FOTOS WHERE IdVeic = ?";
+                $stmt_fotos = $conexao->prepare($sql_fotos);
+                $stmt_fotos->bind_param("i", $veiculo['IdVeic']);
+                $stmt_fotos->execute();
+                $result_fotos = $stmt_fotos->get_result();
+                while ($row = $result_fotos->fetch_assoc()) {
+                    $veiculo['fotos'][] = str_replace('console/', '', $row['Caminho_Foto']); // Remove 'console/' do caminho
+                }
+                $stmt_fotos->close();
             } else {
                 $mensagem = "Nenhum veículo encontrado com o ID ou Modelo especificado.";
             }
@@ -43,48 +39,60 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $mensagem = "Por favor, insira um termo de pesquisa válido.";
         }
     } elseif (isset($_POST['update'])) {
-        $IdVeic = $_POST['IdVeic'];
-        $IdTipo = $_POST['IdTipo'];
-        $IdMarca = $_POST['IdMarca'];
-        $IdCli = $_POST['IdCli'];
-        $Modelo = $_POST['Modelo'];
-        $Ano_Fab = $_POST['Ano_Fab'];
-        $Ano_Mod = $_POST['Ano_Mod'];
-        $km = $_POST['km'];
-        $Renavan = $_POST['Renavan'];
-        $Placa = $_POST['Placa'];
-        $Cor = $_POST['Cor'];
-        $Combustivel = $_POST['Combustivel'];
-        $Cambio = $_POST['Cambio'];
-        $Categoria = $_POST['Categoria'];
-        $Portas = $_POST['Portas'];
-        $ValorIn = $_POST['ValorIn'];
-        $ValorOut = $_POST['ValorOut'];
+        // Inicializar todas as variáveis com valores padrão
+        $IdVeic = $_POST['IdVeic'] ?? null;
+        $IdTipo = $_POST['IdTipo'] ?? '';
+        $IdMarca = $_POST['IdMarca'] ?? '';
+        $IdCli = $_POST['IdCli'] ?? '';
+        $Modelo = $_POST['Modelo'] ?? '';
+        $Ano_Fab = $_POST['Ano_Fab'] ?? '';
+        $Ano_Mod = $_POST['Ano_Mod'] ?? '';
+        $km = $_POST['km'] ?? '';
+        $Renavan = $_POST['Renavan'] ?? '';
+        $Placa = $_POST['Placa'] ?? '';
+        $Cor = $_POST['Cor'] ?? '';
+        $Combustivel = $_POST['Combustivel'] ?? '';
+        $Cambio = $_POST['Cambio'] ?? '';
+        $Categoria = $_POST['Categoria'] ?? '';
+        $Portas = $_POST['Portas'] ?? '';
+        $ValorIn = $_POST['ValorIn'] ?? '';
+        $ValorOut = $_POST['ValorOut'] ?? '';
 
         $sql = "UPDATE VEICULOS SET IdTipo = ?, IdMarca = ?, IdCli = ?, Modelo = ?, Ano_Fab = ?, Ano_Mod = ?, km = ?, Renavan = ?, Placa = ?, Cor = ?, Combustivel = ?, Cambio = ?, Categoria = ?, Portas = ?, ValorIn = ?, ValorOut = ? WHERE IdVeic = ?";
         $stmt = $conexao->prepare($sql);
         $stmt->bind_param("iiiisssssssssssii", $IdTipo, $IdMarca, $IdCli, $Modelo, $Ano_Fab, $Ano_Mod, $km, $Renavan, $Placa, $Cor, $Combustivel, $Cambio, $Categoria, $Portas, $ValorIn, $ValorOut, $IdVeic);
         if ($stmt->execute()) {
             $mensagem = "Veículo atualizado com sucesso!";
-            
+
             // Processar upload de fotos
             for ($i = 1; $i <= 4; $i++) {
                 if (isset($_FILES["foto$i"]) && $_FILES["foto$i"]['error'] == UPLOAD_ERR_OK) {
                     $extensao = pathinfo($_FILES["foto$i"]['name'], PATHINFO_EXTENSION);
                     $novo_nome = $IdVeic . "_foto$i." . $extensao;
-                    $caminho = "imagens/" . $novo_nome;
+                    $caminho = "VEICULOS_FOTOS/" . $novo_nome;
 
                     if (move_uploaded_file($_FILES["foto$i"]['tmp_name'], $caminho)) {
-                        $sql_foto = "INSERT INTO VEICULOS_FOTOS (IdVeic, Caminho_Foto) VALUES (?, ?) ON DUPLICATE KEY UPDATE Caminho_Foto = VALUES(Caminho_Foto)";
+                        $sql_foto = "INSERT INTO VEICULOS_FOTOS (IdVeic, Caminho_Foto) VALUES (?, ?)";
                         $stmt_foto = $conexao->prepare($sql_foto);
-                        $stmt_foto->bind_param("is", $IdVeic, $caminho);
+                        $caminho_db = "VEICULOS_FOTOS/" . $novo_nome; // Caminho correto para o banco de dados
+                        $stmt_foto->bind_param("is", $IdVeic, $caminho_db);
                         $stmt_foto->execute();
                         $stmt_foto->close();
                     }
                 }
             }
-            
-            $veiculo['fotos'] = getFotosVeiculo($conexao, $IdVeic);
+
+            // Obter fotos atualizadas do veículo
+            $veiculo['fotos'] = [];
+            $sql_fotos = "SELECT Caminho_Foto FROM VEICULOS_FOTOS WHERE IdVeic = ?";
+            $stmt_fotos = $conexao->prepare($sql_fotos);
+            $stmt_fotos->bind_param("i", $IdVeic);
+            $stmt_fotos->execute();
+            $result_fotos = $stmt_fotos->get_result();
+            while ($row = $result_fotos->fetch_assoc()) {
+                $veiculo['fotos'][] = str_replace('console/', '', $row['Caminho_Foto']); // Remove 'console/' do caminho
+            }
+            $stmt_fotos->close();
         } else {
             $mensagem = "Erro ao atualizar o veículo: " . $stmt->error;
         }
@@ -108,10 +116,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!-- Topnav -->
 <nav class="topnav">
   <a href="index2.php" class="active">Home</a>
-  <a href="modificar-funcionarios.php">Funcionários</a>
-  <a href="modificar-clientes.php">Clientes</a>
-  <a href="modificar-tipos.php">Tipos</a>
-  <a href="modificar-marcas.php">Marcas</a>
+  <a href="modificar-cadastros-funcionarios.php">Funcionários</a>
+  <a href="modificar-cadastros-clientes.php">Clientes</a>
+  <a href="modificar-cadastros-tipos.php">Tipos</a>
+  <a href="modificar-cadastros-marcas.php">Marcas</a>
   <a href="modificar-cadastros-veiculos.php">Veículos</a>
   <a href="modificar-cadastro-acessorios.php">Acessórios</a>
   <a href="sair.php" class="botao-sair">Sair</a>

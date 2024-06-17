@@ -46,24 +46,31 @@
                 </thead>
                 <tbody>
                     <?php
-                    // Ajustar a consulta SQL para fazer o JOIN entre VEICULOS e MARCAS_VEICULOS, e obter a primeira foto
-                    $sql = "SELECT VEICULOS.IdVeic, 
-                                   MARCAS_VEICULOS.Marca AS Marca, 
-                                   VEICULOS.Modelo, 
-                                   VEICULOS.Ano_Fab, 
-                                   VEICULOS.km, 
-                                   VEICULOS.ValorOut, 
-                                   (SELECT Caminho_Foto FROM VEICULOS_FOTOS WHERE VEICULOS_FOTOS.IdVeic = VEICULOS.IdVeic LIMIT 1) AS Foto 
-                            FROM VEICULOS 
-                            JOIN MARCAS_VEICULOS ON VEICULOS.IdMarca = MARCAS_VEICULOS.IdMarca";
+                    // Ajustar a consulta SQL para fazer o JOIN entre VEICULOS e MARCAS_VEICULOS, e obter apenas a primeira foto
+                    $sql = "SELECT v.IdVeic, 
+                                   mv.Marca AS Marca, 
+                                   v.Modelo, 
+                                   v.Ano_Fab, 
+                                   v.km, 
+                                   v.ValorOut, 
+                                   vf.Caminho_Foto 
+                            FROM VEICULOS v 
+                            JOIN MARCAS_VEICULOS mv ON v.IdMarca = mv.IdMarca 
+                            LEFT JOIN (
+                                SELECT IdVeic, Caminho_Foto,
+                                       ROW_NUMBER() OVER (PARTITION BY IdVeic ORDER BY IdFoto) AS RowNumber
+                                FROM VEICULOS_FOTOS
+                            ) vf ON v.IdVeic = vf.IdVeic AND vf.RowNumber = 1";
+                    
                     $result = $conexao->query($sql);
-                    if ($result->num_rows > 0) {
+                    
+                    if ($result && $result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
                             echo "<tr>";
                             echo "<td><a href='detalhes_veiculo.php?id=" . $row['IdVeic'] . "'>" . $row['IdVeic'] . "</a></td>";
                             echo "<td>";
-                            if (!empty($row['Foto'])) {
-                                echo "<img src='" . $row['Foto'] . "' alt='Foto do Veículo' class='img-thumbnail'>";
+                            if (!empty($row['Caminho_Foto'])) {
+                                echo "<img src='" . $row['Caminho_Foto'] . "' alt='Foto do Veículo' class='img-thumbnail'>";
                             } else {
                                 echo "Sem foto";
                             }
@@ -72,7 +79,7 @@
                             echo "<td>" . $row['Modelo'] . "</td>";
                             echo "<td>" . $row['Ano_Fab'] . "</td>";
                             echo "<td class='alinhar-direita'>" . $row['km'] . "</td>";
-                            echo "<td class='alinhar-direita'>" . "R$" . number_format($row['ValorOut'], 2, ',', '.') . "</td>"; // Adicionando "R$" antes do valor de ValorOut e alinhando à direita
+                            echo "<td class='alinhar-direita'>" . "R$" . number_format($row['ValorOut'], 2, ',', '.') . "</td>";
                             echo "</tr>";
                         }
                     } else {

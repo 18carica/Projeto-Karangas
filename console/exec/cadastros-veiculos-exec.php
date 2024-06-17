@@ -2,6 +2,7 @@
 // Recuperar os dados de Tipos e Marcas
 $tipos = [];
 $marcas = [];
+//$caminho_banco = "console/VEICULOS_FOTOS/";
 
 $sql_tipos = "SELECT IdTipo, Tipo_Veiculo FROM TIPOSVEICULOS";
 $result_tipos = $conexao->query($sql_tipos);
@@ -64,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if (move_uploaded_file($_FILES["foto$i"]['tmp_name'], $caminho)) {
                     $sql_foto = "INSERT INTO VEICULOS_FOTOS (IdVeic, Caminho_Foto) VALUES (?, ?)";
                     $stmt_foto = $conexao->prepare($sql_foto);
+                    $caminho = "console/VEICULOS_FOTOS/" . $novo_nome;
                     $stmt_foto->bind_param("is", $IdVeic, $caminho);
                     $stmt_foto->execute();
                     $stmt_foto->close();
