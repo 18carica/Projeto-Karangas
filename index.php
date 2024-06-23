@@ -7,20 +7,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Karanga! A sua loja de carros.</title>
-    <link rel="stylesheet" href="console/css/karanga.css">
+    <link rel="stylesheet" href="./console/css/karanga.css">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0-alpha1/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .table-bordered th,
         .table-bordered td {
             border: 1px solid Black;
         }
-        /* CSS para alinhar à direita apenas a coluna "Valor de Saída" */
-        .alinhar-direita {
-            text-align: right;
+        /* CSS para alinhar*/
+        .alinhar {
+            text-align: center;
         }
         .img-thumbnail {
             width: 100px;
             height: auto;
+        }
+
+        table {
+            width: 300%;
+            border-collapse: collapse;
+        }
+
+        th{
+            background-color: grey;
+            color: white;
         }
     </style>
 </head>
@@ -67,19 +77,19 @@
                     if ($result && $result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
                             echo "<tr>";
-                            echo "<td><a href='detalhes_veiculo.php?id=" . $row['IdVeic'] . "'>" . $row['IdVeic'] . "</a></td>";
-                            echo "<td>";
+                            echo "<td class='alinhar'><a href='detalhes_veiculo.php?id=" . $row['IdVeic'] . "'>" . $row['IdVeic'] . "</a></td>";
+                            echo "<td class='alinhar'>";
                             if (!empty($row['Caminho_Foto'])) {
                                 echo "<img src='" . $row['Caminho_Foto'] . "' alt='Foto do Veículo' class='img-thumbnail'>";
                             } else {
                                 echo "Sem foto";
                             }
                             echo "</td>";
-                            echo "<td>" . $row['Marca'] . "</td>";
-                            echo "<td>" . $row['Modelo'] . "</td>";
-                            echo "<td>" . $row['Ano_Fab'] . "</td>";
-                            echo "<td class='alinhar-direita'>" . $row['km'] . "</td>";
-                            echo "<td class='alinhar-direita'>" . "R$" . number_format($row['ValorOut'], 2, ',', '.') . "</td>";
+                            echo "<td class='alinhar'>" . $row['Marca'] . "</td>";
+                            echo "<td class='alinhar'>" . $row['Modelo'] . "</td>";
+                            echo "<td class='alinhar'>" . $row['Ano_Fab'] . "</td>";
+                            echo "<td class='alinhar'>" . $row['km'] . "</td>";
+                            echo "<td class='alinhar'>" . "R$" . number_format($row['ValorOut'], 2, ',', '.') . "</td>";
                             echo "</tr>";
                         }
                     } else {
